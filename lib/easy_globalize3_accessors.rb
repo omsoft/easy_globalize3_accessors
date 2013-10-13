@@ -9,6 +9,7 @@ module EasyGlobalize3Accessors
 
     each_attribute_and_locale(options) do |attr_name, locale|
       define_accessors(attr_name, locale)
+      define_accessible(attr_name, locale)
     end
   end
 
@@ -22,6 +23,10 @@ module EasyGlobalize3Accessors
   end
 
 
+  def define_accessible(attr_name, locale)
+    attr_accessible("#{attr_name}_#{locale}")
+  end
+
   def define_getter(attr_name, locale)
     define_method :"#{attr_name}_#{locale.to_s.underscore}" do
       read_attribute(attr_name, :locale => locale)
@@ -30,7 +35,7 @@ module EasyGlobalize3Accessors
 
   def define_setter(attr_name, locale)
     define_method :"#{attr_name}_#{locale.to_s.underscore}=" do |value|
-      write_attribute(attr_name, value, :locale => locale)
+      write_attribute(attr_name, value, :locale => locale) if value.present?
     end
     if respond_to?(:accessible_attributes) && accessible_attributes.include?(attr_name)
       attr_accessible :"#{attr_name}_#{locale.to_s.underscore}"
